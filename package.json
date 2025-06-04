@@ -1,16 +1,13 @@
 {
   "name": "wppconnect-proctor",
   "version": "1.0.0",
-  "description": "Projeto simples para enviar mensagens WhatsApp usando wppconnect",
+  "description": "Projeto simples para envio de mensagens via wppconnect",
   "main": "index.js",
-  "engines": {
-    "node": ">=16"
-  },
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-"@wppconnect-team/wppconnect": "^2.3.7"
+    "@wppconnect-team/wppconnect": "^2.3.7",
     "express": "^4.18.2"
   }
 }
