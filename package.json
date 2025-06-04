@@ -7,10 +7,11 @@
     "start": "node index.js"
   },
   "engines": {
-    "node": ">=16 <19"
+    "node": "18.x",
+    "npm": "9.x"
   },
   "dependencies": {
-    "@wppconnect-team/wppconnect": "^2.2.8",
+    "@wppconnect-team/wppconnect": "^2.2.6",
     "express": "^4.18.2"
   }
 }
