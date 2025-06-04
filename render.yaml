@@ -1,7 +1,0 @@
-services:
-  - type: web
-    name: wppconnect-full
-    env: python
-    buildCommand: bash start.sh
-    startCommand: bash start.sh
-    plan: free
