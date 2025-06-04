@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>WppConnect Sender</title>
+  <meta charset="utf-8">
+  <style>
+    body { font-family: sans-serif; text-align: center; padding: 40px; }
+    input, textarea { width: 300px; padding: 10px; margin: 10px; display: block; }
+    button { padding: 10px 20px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <h1>Enviar Mensagem WhatsApp</h1>
+  <input id="number" type="text" placeholder="Número com DDI. Ex: 25884xxxxxxx" required>
+  <textarea id="message" placeholder="Digite sua mensagem"></textarea>
+  <button onclick="enviar()">Enviar</button>
+  <p id="status"></p>
+
+  <script>
+    async function enviar() {
+      const number = document.getElementById("number").value;
+      const message = document.getElementById("message").value;
+      const res = await fetch("/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ number, message })
+      });
+      const data = await res.json();
+      document.getElementById("status").innerText = data.status || data.error;
+    }
+  </script>
+</body>
+</html>
