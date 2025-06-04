@@ -6,8 +6,11 @@
   "scripts": {
     "start": "node index.js"
   },
+  "engines": {
+    "node": ">=16 <19"
+  },
   "dependencies": {
-    "@wppconnect-team/wppconnect": "^2.3.7",
+    "@wppconnect-team/wppconnect": "^2.2.8",
     "express": "^4.18.2"
   }
 }
