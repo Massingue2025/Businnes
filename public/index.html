@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>WhatsApp Connect</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 30px;
+      background: #f9f9f9;
+    }
+    #qrcode, #message-form {
+      margin: 20px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 10px;
+      width: 350px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, textarea, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #25D366;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .status {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Conexão com WhatsApp</h1>
+
+  <div id="qrcode">
+    <p>Carregando QR Code...</p>
+  </div>
+
+  <div id="message-form" style="display: none;">
+    <h3>Enviar Mensagem</h3>
+    <input type="text" id="phone" placeholder="Número (Ex: 25884xxxxxxx)" />
+    <textarea id="message" placeholder="Mensagem..."></textarea>
+    <button onclick="sendMessage()">Enviar</button>
+    <div class="status" id="sendStatus"></div>
+  </div>
+
+  <script>
+    const qrDiv = document.getElementById("qrcode");
+    const formDiv = document.getElementById("message-form");
+    const sendStatus = document.getElementById("sendStatus");
+
+    async function fetchQrCode() {
+      try {
+        const res = await fetch("/qr-code");
+        if (!res.ok) {
+          qrDiv.style.display = "none";
+          formDiv.style.display = "block";
+          return;
+        }
+        const data = await res.json();
+        qrDiv.innerHTML = `<img src="${data.qr}" width="300" />`;
+        formDiv.style.display = "none";
+        qrDiv.style.display = "block";
+      } catch (e) {
+        qrDiv.innerHTML = "<p>Erro ao buscar QR Code</p>";
+      }
+    }
+
+    async function sendMessage() {
+      const phone = document.getElementById("phone").value.trim();
+      const message = document.getElementById("message").value.trim();
+      sendStatus.textContent = "";
+
+      if (!phone || !message) {
+        sendStatus.textContent = "Preencha todos os campos!";
+        return;
+      }
+
+      try {
+        const res = await fetch("/send-message", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ phone, message }),
+        });
+
+        const data = await res.json();
+        sendStatus.textContent = "✅ Mensagem enviada com sucesso!";
+      } catch (e) {
+        sendStatus.textContent = "❌ Erro ao enviar mensagem";
+      }
+    }
+
+    // Verifica se está conectado e alterna entre QR e formulário
+    setInterval(fetchQrCode, 3000);
+    fetchQrCode();
+  </script>
+</body>
+</html>
