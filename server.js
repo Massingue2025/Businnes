@@ -10,7 +10,7 @@ wppconnect
   .create({
     session: 'default',
     headless: true,
-    useChrome: true, // usa o Chrome do sistema (Render)
+    useChrome: true, // usar o Chrome/Chromium do sistema
     browserArgs: [
       '--no-sandbox',
       '--disable-setuid-sandbox',
@@ -20,7 +20,7 @@ wppconnect
       '--no-zygote',
       '--single-process',
       '--disable-gpu'
-    ]
+    ],
   })
   .then((cli) => {
     client = cli;
@@ -28,12 +28,17 @@ wppconnect
 
     app.post("/send-message", async (req, res) => {
       const { phone, message } = req.body;
-      if (!client) return res.status(500).send("Cliente não conectado");
+
+      if (!client) {
+        return res.status(500).send("Cliente não conectado");
+      }
+
       try {
         const result = await client.sendText(`${phone}@c.us`, message);
         res.send(result);
       } catch (err) {
-        res.status(500).send(err);
+        console.error("Erro ao enviar mensagem:", err);
+        res.status(500).send(err.toString());
       }
     });
   })
@@ -41,6 +46,7 @@ wppconnect
     console.error("Erro ao iniciar WPPConnect:", error);
   });
 
-app.listen(21465, () => {
-  console.log("🚀 Servidor rodando na porta 21465");
+const PORT = process.env.PORT || 21465;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
