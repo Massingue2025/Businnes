@@ -1,12 +1,13 @@
 {
-  "name": "facebook-live-streamer",
+  "name": "wppconnect-server",
   "version": "1.0.0",
-  "description": "Live para o Facebook usando vídeo remoto via ffmpeg",
+  "description": "Servidor API WhatsApp com WPPConnect",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
-    "dotenv": "^16.0.3"
+    "@wppconnect-team/wppconnect": "^1.9.1",
+    "express": "^4.18.2"
   }
 }
