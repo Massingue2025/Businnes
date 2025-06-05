@@ -1,4 +1,3 @@
-
 FROM node:18
 
 # Dependências do sistema para Chromium
@@ -11,22 +10,26 @@ RUN apt-get update && apt-get install -y \
     libgbm-dev \
     libxshmfence-dev \
     wget \
-    ca-certificates
+    ca-certificates \
+ && apt-get clean
 
-# Diretório do app
+# Diretório de trabalho
 WORKDIR /app
 
-# Clonar WPPConnect Server
+# Clonar repositório
 RUN git clone https://github.com/wppconnect-team/wppconnect-server.git .
-
-# Copiar variáveis de ambiente
-COPY .env .env
 
 # Instalar dependências
 RUN npm install
 
-# Expor porta padrão
+# Compilar TypeScript para JavaScript
+RUN npm run build
+
+# Copiar variáveis de ambiente
+COPY .env .env
+
+# Expor porta
 EXPOSE 21465
 
-# Iniciar app
+# Iniciar o servidor
 CMD ["npm", "start"]
