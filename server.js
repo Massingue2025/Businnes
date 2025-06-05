@@ -1,42 +1,82 @@
-const { spawn } = require("child_process");
-require("dotenv").config();
+const express = require("express");
+const path = require("path");
+const wppconnect = require("@wppconnect-team/wppconnect");
 
-const FB_STREAM_KEY = process.env.FB_STREAM_KEY;
-const VIDEO_URL = process.env.VIDEO_URL;
-const DURATION_MINUTES = parseInt(process.env.LIVE_DURATION_MINUTES || "30", 10);
+const app = express();
+app.use(express.static("public")); // Servir HTML e JS
+app.use(express.json());
 
-if (!FB_STREAM_KEY || !VIDEO_URL) {
-  console.error("Erro: .env incompleto");
-  process.exit(1);
-}
+let client = null;
+let currentQR = null;
 
-const streamUrl = `rtmps://live-api-s.facebook.com:443/rtmp/${FB_STREAM_KEY}`;
-const totalSeconds = DURATION_MINUTES * 60;
+wppconnect
+  .create({
+    session: 'default',
+    headless: true,
+    useChrome: true,
+    browserArgs: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--single-process',
+      '--disable-gpu'
+    ],
+    catchQR: (base64Qr, asciiQR, attempts, urlCode) => {
+      console.log("📷 Novo QR Code gerado");
+      currentQR = base64Qr;
+    },
+    statusFind: (statusSession, session) => {
+      console.log("📲 Status da sessão:", statusSession);
+    },
+    logQR: false,
+    autoClose: false, // MANTÉM A SESSÃO ABERTA PRA SEMPRE
+  })
+  .then((cli) => {
+    client = cli;
+    console.log("✅ Cliente conectado ao WhatsApp");
 
-console.log(`🔴 Iniciando transmissão ao vivo por ${DURATION_MINUTES} minutos...`);
+    client.onLogout(() => {
+      console.log("🔌 Cliente desconectado. Reiniciando...");
+      client = null;
+    });
+  })
+  .catch((error) => {
+    console.error("Erro ao iniciar WPPConnect:", error);
+  });
 
-const ffmpegProcess = spawn("ffmpeg", [
-  "-re",
-  "-stream_loop", "-1",
-  "-i", VIDEO_URL,
-  "-c:v", "libx264",
-  "-preset", "veryfast",
-  "-maxrate", "3000k",
-  "-bufsize", "6000k",
-  "-pix_fmt", "yuv420p",
-  "-g", "50",
-  "-c:a", "aac",
-  "-b:a", "128k",
-  "-f", "flv",
-  streamUrl
-], { stdio: "inherit" });
+// Endpoint para enviar mensagem
+app.post("/send-message", async (req, res) => {
+  const { phone, message } = req.body;
 
-const startTime = Date.now();
-const interval = setInterval(() => {
-  const elapsed = (Date.now() - startTime) / 1000;
-  if (elapsed >= totalSeconds) {
-    console.log("⏹️ Tempo de live esgotado. Encerrando...");
-    ffmpegProcess.kill("SIGINT");
-    clearInterval(interval);
+  if (!client) return res.status(500).send("Cliente não conectado");
+
+  try {
+    const result = await client.sendText(`${phone}@c.us`, message);
+    res.send(result);
+  } catch (err) {
+    console.error("Erro:", err);
+    res.status(500).send(err.toString());
   }
-}, 5000);
+});
+
+// Endpoint para buscar o QR Code
+app.get("/qr-code", (req, res) => {
+  if (!currentQR) {
+    return res.status(404).send("QR Code ainda não gerado");
+  }
+
+  res.json({ qr: currentQR });
+});
+
+// Página HTML principal
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+const PORT = process.env.PORT || 21465;
+app.listen(PORT, () => {
+  console.log(`🚀 Servidor rodando em http://localhost:${PORT}`);
+});
