@@ -10,10 +10,17 @@ wppconnect
   .create({
     session: 'default',
     headless: true,
-    useChrome: false,
-    puppeteerOptions: {
-      args: ['--no-sandbox'],
-    }
+    useChrome: true, // usa o Chrome do sistema (Render)
+    browserArgs: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-accelerated-2d-canvas',
+      '--no-first-run',
+      '--no-zygote',
+      '--single-process',
+      '--disable-gpu'
+    ]
   })
   .then((cli) => {
     client = cli;
@@ -29,6 +36,9 @@ wppconnect
         res.status(500).send(err);
       }
     });
+  })
+  .catch((error) => {
+    console.error("Erro ao iniciar WPPConnect:", error);
   });
 
 app.listen(21465, () => {
