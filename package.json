@@ -1,17 +1,9 @@
 {
-  "name": "wppconnect-proctor",
+  "name": "wppconnect-render",
   "version": "1.0.0",
-  "description": "Projeto simples para envio de mensagens via wppconnect",
-  "main": "index.js",
+  "description": "Servidor WPPConnect configurado para Render",
   "scripts": {
     "start": "node index.js"
   },
-  "engines": {
-    "node": "18.x"
-  },
-  "license": "MIT",
-  "dependencies": {
-    "@wppconnect-team/wppconnect": "latest",
-    "express": "^4.18.2"
-  }
+  "dependencies": {}
 }
