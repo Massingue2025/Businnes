@@ -1,9 +1,13 @@
 {
-  "name": "wppconnect-render",
+  "name": "wppconnect-server",
   "version": "1.0.0",
-  "description": "Servidor WPPConnect configurado para Render",
+  "description": "Servidor API WhatsApp com WPPConnect",
+  "main": "server.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   },
-  "dependencies": {}
+  "dependencies": {
+    "@wppconnect-team/wppconnect": "^1.9.1",
+    "express": "^4.18.2"
+  }
 }
