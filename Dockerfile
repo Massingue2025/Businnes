@@ -1,9 +1,9 @@
-# Usar imagem oficial Node.js (Debian-based)
 FROM node:18
 
-# Instalar dependências necessárias para Chromium
+# Instalar dependências para Chromium
 RUN apt-get update && apt-get install -y \
     libdrm2 \
+    libgbm1 \
     wget \
     ca-certificates \
     fonts-liberation \
@@ -24,18 +24,13 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
-# Criar diretório de trabalho
 WORKDIR /app
 
-# Copiar arquivos de dependência e instalar
 COPY package*.json ./
 RUN npm install
 
-# Copiar todo o restante do código
 COPY . .
 
-# Expor a porta do seu app
 EXPOSE 21465
 
-# Comando para rodar seu servidor
 CMD ["node", "server.js"]
