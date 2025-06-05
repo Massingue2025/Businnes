@@ -1,9 +1,7 @@
 FROM node:18
 
-# Instalar dependências para Chromium
+# Instalar dependências obrigatórias para Chromium headless
 RUN apt-get update && apt-get install -y \
-    libdrm2 \
-    libgbm1 \
     wget \
     ca-certificates \
     fonts-liberation \
@@ -16,11 +14,16 @@ RUN apt-get update && apt-get install -y \
     libgdk-pixbuf2.0-0 \
     libnspr4 \
     libnss3 \
+    libnss3-dev \
     libx11-xcb1 \
     libxcomposite1 \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    libgbm1 \
+    libdrm2 \
+    libu2f-udev \
+    libxshmfence1 \
     --no-install-recommends \
  && rm -rf /var/lib/apt/lists/*
 
